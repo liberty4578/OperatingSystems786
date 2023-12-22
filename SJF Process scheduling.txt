@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+struct Process {
+ int processID; 
+ int arrivalTime; 
+ int burstTime;
+ int waitingTime; 
+ int turnaroundTime; 
+};
+void findWaitingTime(struct Process *processes, int n) {
+ int *remainingTime = (int *)malloc(n * sizeof(int));
+ for (int i = 0; i < n; i++) {
+ remainingTime[i] = processes[i].burstTime;
+ }
+ int complete = 0;
+ int currentTime = 0;
+ while (complete < n) {
+ int shortestProcess = -1;
+ int shortestBurst = INT_MAX;
+ for (int i = 0; i < n; i++) {
+ if (processes[i].arrivalTime <= currentTime &&
+remainingTime[i] < shortestBurst && remainingTime[i] > 0) {
+ shortestProcess = i;
+ shortestBurst = remainingTime[i];
+ }
+ }
+ if (shortestProcess == -1) {
+ currentTime++;
+ continue;
+ }
+ processes[shortestProcess].waitingTime = currentTime -
+processes[shortestProcess].arrivalTime;
+ currentTime += remainingTime[shortestProcess];
+ remainingTime[shortestProcess] = 0;
+ complete++;
+ }
+ free(remainingTime);
+}
+void findTurnaroundTime(struct Process *processes, int n) {
+ for (int i = 0; i < n; i++) {
+ processes[i].turnaroundTime = processes[i].burstTime +
+processes[i].waitingTime;
+ }
+}
+void findAverageTime(struct Process *processes, int n) {
+ int totalWaitingTime = 0;
+ int totalTurnaroundTime = 0;
+ findWaitingTime(processes, n);
+ findTurnaroundTime(processes, n);
+ for (int i = 0; i < n; i++) {
+ totalWaitingTime += processes[i].waitingTime;
+ totalTurnaroundTime += processes[i].turnaroundTime;
+ }
+ float averageWaitingTime = (float)totalWaitingTime / n;
+ float averageTurnaroundTime = (float)totalTurnaroundTime / n;
+ printf("Average Waiting Time: %.2f\n", averageWaitingTime);
+ printf("Average Turnaround Time: %.2f\n", 
+averageTurnaroundTime);
+}
+int main() {
+ int n;
+ printf("Enter the number of processes: ");
+ scanf("%d", &n);
+ struct Process *processes = (struct Process *)malloc(n *
+sizeof(struct Process));
+ printf("Enter arrival time and burst time for each process:
+\n");
+ for (int i = 0; i < n; i++) {
+ processes[i].processID = i + 1;
+ scanf("%d %d", &processes[i].arrivalTime, 
+&processes[i].burstTime);
+ }
+ findAverageTime(processes, n);
+ free(processes);
+ return 0;}

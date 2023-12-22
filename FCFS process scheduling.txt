@@ -1,0 +1,46 @@
+#include <stdio.h>
+void findWaitingTimeTurnaroundTime(int processes[], int n, int
+burstTime[], int waitingTime[], int turnaroundTime[]) {
+ 
+ waitingTime[0] = 0;
+ 
+ for (int i = 1; i < n; i++) {
+ waitingTime[i] = waitingTime[i - 1] + burstTime[i - 1];
+ }
+ for (int i = 0; i < n; i++) {
+ turnaroundTime[i] = waitingTime[i] + burstTime[i];
+ }
+}
+ void findAverageTime(int processes[], int n, int burstTime[]) 
+{
+ int waitingTime[n], turnaroundTime[n];
+ 
+ findWaitingTimeTurnaroundTime(processes, n, burstTime, 
+waitingTime, turnaroundTime);
+ 
+ int totalWaitingTime = 0, totalTurnaroundTime = 0;
+ for (int i = 0; i < n; i++) {
+ totalWaitingTime += waitingTime[i];
+ totalTurnaroundTime += turnaroundTime[i];
+ }
+ 
+ float averageWaitingTime = (float)totalWaitingTime / n;
+ float averageTurnaroundTime = (float)totalTurnaroundTime / n;
+ printf("Average Waiting Time: %.2f\n", averageWaitingTime);
+ printf("Average Turnaround Time: %.2f\n", 
+averageTurnaroundTime);
+}
+int main() {
+ int n; 
+ printf("Enter the number of processes: ");
+ scanf("%d", &n);
+ int processes[n];
+ int burstTime[n]; 
+ printf("Enter burst time for each process:\n");
+ for (int i = 0; i < n; i++) {
+ processes[i] = i + 1;
+ scanf("%d", &burstTime[i]);
+ }
+ findAverageTime(processes, n, burstTime);
+ return 0;
+}
